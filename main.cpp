@@ -12,7 +12,9 @@
 using namespace std;
 
 bool cmp_start(vector<int>a, vector<int>b){return a.at(0) < b.at(0);}
-bool cmp_next(vector<int>a, vector<int>b){return a.at(2) > b.at(2);}
+bool cmp_end(vector<int>a, vector<int>b){return a.at(1) < b.at(1);}
+
+int result=0;
 
 int main() {
     int num;
@@ -27,36 +29,30 @@ int main() {
         cin >> a >> b;
         conf.at(i).push_back(a);
         conf.at(i).push_back(b);
-        conf.at(i).push_back(1);
     }
     
     //정렬
-    sort(conf.begin(), conf.end(), cmp_start);
-    
-    int maxIndex = num-1;
-    int temp = conf.at(maxIndex).at(0); // 마지막 강의의 시작시간
-    while(conf.at(maxIndex).at(0) == temp){maxIndex--;}
-    
-    for(int i=maxIndex; i>=0; i--){
-        //늦게시작하는 강의찾기
-        int late=conf.at(i).at(1);
-        int lateIndex=0;
-        while(late >= conf.at(lateIndex).at(0)){
-            lateIndex++;
-            if(lateIndex == num){
-                lateIndex = 10;
+    sort(conf.begin(), conf.end(), cmp_end);
+    int now_start=0;
+    for(int i=0; i<num; i++){
+        if(now_start <= conf[i][0]){
+            
+            if(i == num-1){
+                result++;
                 break;
             }
+            
+            int j = i+1;
+            while(conf[i][1] == conf[j][1] && j<num-1){
+                j++;
+                if(j==num)
+                    break;
+            }
                 
+            sort(conf.begin()+i, conf.begin()+j, cmp_start);
+            now_start = conf[i][1];
+            result++;
         }
-        int next=conf.at(lateIndex).at(2);
-        while(lateIndex <= (num-1)){
-            if(next < conf.at(lateIndex).at(2))
-                next = conf.at(lateIndex).at(2);
-            lateIndex++;
-        }
-        conf.at(i).at(2) = next + 1;
     }
-    sort(conf.begin(), conf.end(), cmp_next);
-    cout << conf.at(0).at(2);
+    cout << result;
 }
